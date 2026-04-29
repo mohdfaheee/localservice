@@ -8,6 +8,8 @@ interface FilterSidebarProps {
   onPriceChange: (range: [number, number]) => void;
   minRating: number;
   onRatingChange: (rating: number) => void;
+  locationInput: string;
+  onLocationChange: (loc: string) => void;
 }
 
 const FilterSidebar = ({
@@ -15,6 +17,8 @@ const FilterSidebar = ({
   onCategoryChange,
   minRating,
   onRatingChange,
+  locationInput,
+  onLocationChange,
 }: FilterSidebarProps) => {
   return (
     <motion.div
@@ -51,19 +55,29 @@ const FilterSidebar = ({
       </div>
 
       <div>
+        <h3 className="font-semibold text-foreground mb-3 text-sm">Location (City)</h3>
+        <input
+          value={locationInput}
+          onChange={(e) => onLocationChange(e.target.value)}
+          placeholder="Enter city..."
+          className="w-full h-10 px-3 rounded-lg bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+        />
+      </div>
+
+      <div>
         <h3 className="font-semibold text-foreground mb-3 text-sm">Minimum Rating</h3>
-        <div className="flex gap-2">
-          {[0, 4, 4.5, 4.8].map((r) => (
+        <div className="flex flex-wrap gap-2">
+          {[0, 3, 4, 4.5].map((r) => (
             <button
               key={r}
               onClick={() => onRatingChange(r)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 minRating === r
-                  ? "gradient-primary text-primary-foreground"
+                  ? "gradient-primary text-primary-foreground shadow-sm"
                   : "bg-secondary text-secondary-foreground hover:bg-primary/10"
               }`}
             >
-              {r === 0 ? "All" : `${r}+`}
+              {r === 0 ? "Any" : `${r}+ ★`}
             </button>
           ))}
         </div>

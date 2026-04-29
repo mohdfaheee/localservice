@@ -1,38 +1,55 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
-import { services } from "@/data/mockData";
+import { api } from "@/lib/api";
+import type { Service } from "@/types/database";
 import Navbar from "@/components/Navbar";
 import ServiceCard from "@/components/ServiceCard";
 import FilterSidebar from "@/components/FilterSidebar";
 import SkeletonCard from "@/components/SkeletonCard";
-import ChatWidget from "@/components/ChatWidget";
 import { Search } from "lucide-react";
 
 const Services = () => {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
+  const [realServices, setRealServices] = useState<Service[]>([]); 
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 200]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]); 
   const [minRating, setMinRating] = useState(0);
+  const [locationInput, setLocationInput] = useState("");
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 800);
-    return () => clearTimeout(timer);
+    const fetchServices = async () => {
+      setLoading(true);
+      try {
+        const data = await api.getServices();
+        setRealServices(data || []);
+      } catch (error) {
+        console.error("Error fetching services:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServices();
   }, []);
 
-  const filtered = services.filter((s) => {
+  const filtered = realServices.filter((s) => {
+    const serviceName = s.name || ""; 
+    const serviceLoc = s.location || "";
+    
     if (selectedCategory && s.category !== selectedCategory) return false;
-    if (minRating && s.rating < minRating) return false;
-    if (search && !s.title.toLowerCase().includes(search.toLowerCase())) return false;
+    if (s.price < priceRange[0] || s.price > priceRange[1]) return false;
+    if (search && !serviceName.toLowerCase().includes(search.toLowerCase())) return false;
+    if (locationInput && !serviceLoc.toLowerCase().includes(locationInput.toLowerCase())) return false;
+    if (s.rating < minRating) return false;
     return true;
   });
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <ChatWidget />
 
       <div className="container mx-auto pt-24 pb-16 px-4">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
@@ -40,19 +57,17 @@ const Services = () => {
           <p className="text-muted-foreground">Find the perfect service provider for your needs</p>
         </motion.div>
 
-        {/* Search */}
         <div className="relative max-w-md mb-8">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search services..."
-            className="w-full h-11 pl-11 pr-4 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="w-full h-11 pl-11 pr-4 rounded-xl bg-card border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
         </div>
 
-        <div className="flex gap-8">
-          {/* Sidebar */}
+        <div className="flex flex-col lg:flex-row gap-8">
           <div className="hidden lg:block w-64 shrink-0">
             <FilterSidebar
               selectedCategory={selectedCategory}
@@ -61,10 +76,11 @@ const Services = () => {
               onPriceChange={setPriceRange}
               minRating={minRating}
               onRatingChange={setMinRating}
+              locationInput={locationInput}
+              onLocationChange={setLocationInput}
             />
           </div>
 
-          {/* Grid */}
           <div className="flex-1">
             {loading ? (
               <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">

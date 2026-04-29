@@ -27,14 +27,14 @@ export interface Booking {
 }
 
 export const categories = [
-  { id: "cleaning", name: "Cleaning", icon: "🧹", count: 45 },
-  { id: "plumbing", name: "Plumbing", icon: "🔧", count: 32 },
-  { id: "electrical", name: "Electrical", icon: "⚡", count: 28 },
-  { id: "gardening", name: "Gardening", icon: "🌿", count: 38 },
-  { id: "painting", name: "Painting", icon: "🎨", count: 22 },
-  { id: "moving", name: "Moving", icon: "📦", count: 18 },
-  { id: "tutoring", name: "Tutoring", icon: "📚", count: 56 },
-  { id: "fitness", name: "Fitness", icon: "💪", count: 41 },
+  { id: "cleaning", name: "Cleaning", icon: "🧹", count: 45, image: "https://images.unsplash.com/photo-1581578731548-c64695cc6954?auto=format&fit=crop&q=80&w=800" },
+  { id: "plumbing", name: "Plumbing", icon: "🔧", count: 32, image: "https://images.unsplash.com/photo-1542013936693-884638332954?auto=format&fit=crop&q=80&w=800" },
+  { id: "electrical", name: "Electrical", icon: "⚡", count: 28, image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=800" },
+  { id: "gardening", name: "Gardening", icon: "🌿", count: 38, image: "https://images.unsplash.com/photo-1558905619-171426ef7ef2?auto=format&fit=crop&q=80&w=800" },
+  { id: "painting", name: "Painting", icon: "🎨", count: 22, image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&q=80&w=800" },
+  { id: "moving", name: "Moving", icon: "📦", count: 18, image: "https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&q=80&w=800" },
+  { id: "tutoring", name: "Tutoring", icon: "📚", count: 56, image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=800" },
+  { id: "fitness", name: "Fitness", icon: "💪", count: 41, image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=800" },
 ];
 
 export const services: Service[] = [

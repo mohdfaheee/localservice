@@ -3,16 +3,19 @@ import { motion } from "framer-motion";
 import { Menu, X, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
   { label: "Home", path: "/" },
   { label: "Services", path: "/services" },
-  { label: "Dashboard", path: "/dashboard" },
+  { label: "Become a Provider", path: "/provider/register" },
+  { label: "My Bookings", path: "/dashboard" },
 ];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   return (
     <motion.nav
@@ -22,10 +25,8 @@ const Navbar = () => {
     >
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-primary-foreground" />
-          </div>
-          <span className="text-lg font-bold text-foreground">LocalServe</span>
+          <img src="/logo.jpg" alt="LocalServe" className="w-8 h-8 rounded-lg object-cover" />
+          <span className="text-xl font-bold text-foreground">LocalServe</span>
         </Link>
 
         {/* Desktop nav */}
@@ -46,12 +47,29 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-3">
-          <Button variant="ghost" size="sm" className="text-muted-foreground">
-            Sign In
-          </Button>
-          <Button size="sm" className="gradient-primary text-primary-foreground border-0 shadow-glow">
-            Get Started
-          </Button>
+          {user ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground"
+              onClick={signOut}
+            >
+              Sign Out
+            </Button>
+          ) : (
+            <>
+              <Link to="/login">
+                <Button variant="ghost" size="sm" className="text-muted-foreground">
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/register">
+                <Button size="sm" className="gradient-primary text-primary-foreground border-0 shadow-glow">
+                  Get Started
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile toggle */}

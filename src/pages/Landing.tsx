@@ -1,46 +1,56 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Search, ArrowRight, Sparkles, Star, Shield, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { categories, services } from "@/data/mockData";
+import { categories } from "@/data/mockData";
 import ServiceCard from "@/components/ServiceCard";
 import Navbar from "@/components/Navbar";
-import ChatWidget from "@/components/ChatWidget";
+import { api } from "@/lib/api";
+import type { Service } from "@/types/database";
 
 const Landing = () => {
+  const [featuredServices, setFeaturedServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.getServices().then(data => {
+      setFeaturedServices(data.slice(0, 3));
+      setLoading(false);
+    });
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <ChatWidget />
 
       {/* Hero */}
       <section className="relative pt-32 pb-20 px-4 overflow-hidden">
-        {/* Background effects */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-1/4 w-96 h-96 rounded-full bg-primary/10 blur-3xl" />
-          <div className="absolute bottom-10 right-1/4 w-80 h-80 rounded-full bg-accent/10 blur-3xl" />
+        {/* Animated Background */}
+        <div className="absolute inset-0 overflow-hidden -z-10">
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.1, 1],
+              rotate: [0, 5, 0],
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            className="absolute -top-[10%] -left-[10%] w-[120%] h-[120%] opacity-20 pointer-events-none"
+            style={{
+              background: "radial-gradient(circle at 20% 30%, var(--primary) 0%, transparent 50%), radial-gradient(circle at 80% 70%, var(--accent) 0%, transparent 50%)",
+              filter: "blur(80px)"
+            }}
+          />
+          <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px]" />
         </div>
 
         <div className="container mx-auto relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-              <Sparkles className="w-3.5 h-3.5" /> AI-Powered Service Discovery
-            </span>
-          </motion.div>
-
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground mb-6 leading-[1.1]"
           >
-            Find Local Services
-            <br />
-            <span className="gradient-text">Powered by AI</span>
+            Find Trusted Local Services Near You
           </motion.h1>
 
           <motion.p
@@ -50,7 +60,6 @@ const Landing = () => {
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
             Discover, compare, and book trusted local service providers in seconds.
-            Our AI assistant helps you find exactly what you need.
           </motion.p>
 
           <motion.div
@@ -59,16 +68,14 @@ const Landing = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
           >
-            <div className="relative w-full max-w-md">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <input
-                placeholder="What service do you need?"
-                className="w-full h-13 pl-12 pr-4 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground text-sm shadow-card focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
-              />
-            </div>
             <Link to="/services">
-              <Button className="gradient-primary text-primary-foreground border-0 shadow-glow h-13 px-6">
-                Explore Services <ArrowRight className="w-4 h-4 ml-2" />
+              <Button size="lg" className="gradient-primary text-primary-foreground border-0 shadow-glow px-8">
+                Find Services <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+            <Link to="/provider/register">
+              <Button size="lg" variant="outline" className="px-8 shadow-sm">
+                Become a Provider
               </Button>
             </Link>
           </motion.div>
@@ -113,11 +120,19 @@ const Landing = () => {
               >
                 <Link
                   to={`/services?category=${cat.id}`}
-                  className="block bg-card border border-border rounded-xl p-4 text-center hover:shadow-card hover:border-primary/20 transition-all group"
+                  className="block relative overflow-hidden h-40 rounded-2xl group shadow-soft hover:shadow-glow transition-all"
                 >
-                  <span className="text-3xl block mb-2">{cat.icon}</span>
-                  <span className="font-medium text-sm text-foreground group-hover:text-primary transition-colors">{cat.name}</span>
-                  <span className="block text-xs text-muted-foreground mt-1">{cat.count} providers</span>
+                  <img 
+                    src={cat.image} 
+                    alt={cat.name} 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 p-4 backdrop-blur-[2px]">
+                    <span className="text-2xl block mb-1 drop-shadow-md">{cat.icon}</span>
+                    <span className="font-bold text-white block drop-shadow-md">{cat.name}</span>
+                    <span className="block text-xs text-white/80 font-medium">{cat.count} providers</span>
+                  </div>
                 </Link>
               </motion.div>
             ))}
@@ -146,9 +161,17 @@ const Landing = () => {
           </motion.div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {services.slice(0, 3).map((service, i) => (
-              <ServiceCard key={service.id} service={service} index={i} />
-            ))}
+            {loading ? (
+              [...Array(3)].map((_, i) => (
+                <div key={i} className="h-64 rounded-xl bg-card animate-pulse shadow-sm" />
+              ))
+            ) : featuredServices.length > 0 ? (
+              featuredServices.map((service, i) => (
+                <ServiceCard key={service.id} service={service} index={i} />
+              ))
+            ) : (
+              <p className="text-center col-span-full text-muted-foreground">No services available yet.</p>
+            )}
           </div>
         </div>
       </section>
@@ -166,7 +189,7 @@ const Landing = () => {
           </motion.div>
           <div className="grid sm:grid-cols-3 gap-6">
             {[
-              { icon: Sparkles, title: "AI-Powered Matching", desc: "Our AI finds the perfect service provider based on your needs, schedule, and budget." },
+              { icon: Sparkles, title: "Smart Matching", desc: "Our platform finds the perfect service provider based on your needs, schedule, and budget." },
               { icon: Shield, title: "Verified Providers", desc: "Every provider is background-checked, licensed, and insured for your peace of mind." },
               { icon: Zap, title: "Instant Booking", desc: "Book services in seconds. No phone calls, no waiting. Confirm and you're set." },
             ].map((item, i) => (
@@ -215,9 +238,7 @@ const Landing = () => {
       <footer className="border-t border-border py-8 px-4">
         <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md gradient-primary flex items-center justify-center">
-              <Sparkles className="w-3 h-3 text-primary-foreground" />
-            </div>
+            <img src="/logo.jpg" alt="LocalServe" className="w-6 h-6 rounded-md object-cover" />
             <span className="font-semibold text-foreground">LocalServe</span>
           </div>
           <p>© 2026 LocalServe. All rights reserved.</p>
